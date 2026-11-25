@@ -1,0 +1,16 @@
+#!/bin/sh
+# Grant the lapis user read/write on any plugged-in Xbox USB controller so Doom's
+# built-in USB driver can use it. Asks for YOUR device password via sudo.
+# Lasts until the controller is unplugged or the Lapis restarts; run again after that.
+U=$(id -un); n=0
+for d in /sys/bus/usb/devices/*:*; do
+  [ -f "$d/bInterfaceClass" ] || continue
+  [ "$(cat $d/bInterfaceClass)" = ff ] || continue
+  case "$(cat $d/bInterfaceSubClass)" in 5d|47) ;; *) continue;; esac
+  dev=$(readlink -f "$(dirname $d)/$(basename $d | cut -d: -f1)")
+  node=$(printf /dev/bus/usb/%03d/%03d $(cat $dev/busnum) $(cat $dev/devnum))
+  echo "$node"
+done | sort -u | while read node; do
+  if command -v setfacl >/dev/null 2>&1; then sudo setfacl -m "u:$U:rw" "$node"; else sudo chown "$U" "$node"; fi \
+    && echo "granted $U rw on $node" && ls -l "$node"
+done

@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+"""DOOM dock: a small resident app that keeps a DOOM entry in the Lapis "What's open" list.
+
+Open it from What's open and press A (or tap the sensor) to start Doom. Doom runs as its own app;
+when you quit Doom the Lapis goes back to Home and this dock stays in What's open for next time.
+The Lapis has no app catalogue for screen apps, so this is how DOOM gets a one-press launcher.
+"""
+import fcntl, os, select, socket, struct, subprocess, sys, time
+from gi.repository import Gio, GLib
+
+HERE = os.path.dirname(os.path.realpath(__file__)); ROOT = os.path.dirname(HERE)
+H = struct.Struct("<4sHHHHIIIQQQII")
+lock = open(os.path.join(os.environ.get("XDG_RUNTIME_DIR", "/tmp"), "lapis-doom-dock.lock"), "w")
+try: fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+except OSError: print("DOOM dock already running"); sys.exit(0)
+
+bus = Gio.bus_get_sync(Gio.BusType.SYSTEM, None)
+mgr = Gio.DBusProxy.new_sync(bus, Gio.DBusProxyFlags.NONE, None, "ai.pamir.Lapis1",
+        "/ai/pamir/Lapis1/AppWindowManager", "ai.pamir.Lapis1.AppWindowManager", None)
+icons = set(mgr.call_sync("ListIcons", None, Gio.DBusCallFlags.NONE, 5000, None).unpack()[0])
+icon = next((i for i in ["gamepad", "game", "controller", "skull", "fire", "bolt"] if i in icons), sorted(icons)[0])
+d_end, c_end = socket.socketpair(socket.AF_UNIX, socket.SOCK_SEQPACKET)
+fds = Gio.UnixFDList.new(); fds.append(d_end.fileno())
+r, _ = mgr.call_with_unix_fd_list_sync("CreateWindow", GLib.Variant("(ssh)", ("DOOM (launcher)", icon, 0)),
+        Gio.DBusCallFlags.NONE, 5000, fds, None)
+d_end.close()
+path = r.unpack()[0]; wid, wgen = (int(x) for x in path.rsplit("/w", 1)[1].split("/g"))
+pix = open(os.path.join(ROOT, "share", "dock.bin"), "rb").read()
+visible = False; vg = 0; tok = 0; seq = 0; requested = False; child = None; last_launch = 0.0
+
+def send_frame():
+    global seq, requested
+    seq += 1
+    c_end.send(H.pack(b"LPFW", 1, 1, 56, 1 | 8, wid, wgen, vg, seq, tok, 0, 12000, 0) + pix)
+    requested = False
+
+def launch():
+    global child, last_launch
+    if time.time() - last_launch < 3 or (child and child.poll() is None): return
+    last_launch = time.time()
+    child = subprocess.Popen([os.path.join(HERE, "lapis-doom-launch")], stdin=subprocess.DEVNULL,
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+
+while True:
+    if child and child.poll() is not None: child = None
+    rl, _, _ = select.select([c_end], [], [], 1.0)
+    if not rl: continue
+    pkt = c_end.recv(4096)
+    if not pkt: break
+    f = H.unpack(pkt[:56]); kind, flags = f[2], f[4]
+    if kind == 2:                                  # visibility
+        visible = bool(flags & 1); vg = f[7]; tok = f[9] if visible else 0; seq = 0
+    elif kind == 3 and visible: send_frame()       # frame requested
+    elif kind == 6: break                          # closing (ended from What's open)
+    elif kind == 8 and (flags & 0xff) in (1, 3, 9) and not (flags & 0x100): launch()   # A / FP press / tap

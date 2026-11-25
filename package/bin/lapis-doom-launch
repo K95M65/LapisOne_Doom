@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+"""Open a Lapis app window over D-Bus and run lapis-doom inside it.
+
+The launcher owns the D-Bus connection and window; lapis-doom (static aarch64
+doomgeneric build) gets the frame socket as LAPIS_FRAME_FD and talks the
+app-window LPFW protocol itself. Extra args are passed to Doom (e.g. -warp 1 1).
+"""
+import fcntl, os, re, socket, sys
+from gi.repository import Gio, GLib
+
+HERE = os.path.dirname(os.path.realpath(__file__))
+ROOT = os.path.dirname(HERE)
+TITLE = "DOOM"
+ICON_PREFS = ["gamepad", "game", "controller", "skull", "fire", "bolt", "terminal"]
+
+lock = open(os.path.join(os.environ.get("XDG_RUNTIME_DIR", "/tmp"), "lapis-doom.lock"), "w")
+try:
+    fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+except OSError:
+    print("lapis-doom is already running", file=sys.stderr); sys.exit(1)
+
+bus = Gio.bus_get_sync(Gio.BusType.SYSTEM, None)
+mgr = Gio.DBusProxy.new_sync(connection=bus, flags=Gio.DBusProxyFlags.NONE, info=None,
+    name="ai.pamir.Lapis1", object_path="/ai/pamir/Lapis1/AppWindowManager",
+    interface_name="ai.pamir.Lapis1.AppWindowManager", cancellable=None)
+
+def call(m, sig="()", args=(), fds=None):
+    p = GLib.Variant(sig, args)
+    if fds is None:
+        return mgr.call_sync(method_name=m, parameters=p, flags=Gio.DBusCallFlags.NONE,
+                             timeout_msec=5000, cancellable=None).unpack()
+    r, _ = mgr.call_with_unix_fd_list_sync(method_name=m, parameters=p, flags=Gio.DBusCallFlags.NONE,
+                             timeout_msec=5000, fd_list=fds, cancellable=None)
+    return r.unpack()
+
+caps = call("GetCapabilities")
+if (caps[1], caps[2], caps[3], caps[4]) != (400, 240, 50, "MONO_1BPP_MSB_FIRST"):
+    print("unexpected screen caps", caps, file=sys.stderr); sys.exit(2)
+icons = set(call("ListIcons")[0])
+icon = next((i for i in ICON_PREFS if i in icons), sorted(icons)[0])
+
+daemon_end, client_end = socket.socketpair(socket.AF_UNIX, socket.SOCK_SEQPACKET)
+daemon_end.setblocking(False); client_end.setblocking(False)
+fds = Gio.UnixFDList.new(); fds.append(daemon_end.fileno())
+path = call("CreateWindow", "(ssh)", (TITLE, icon, 0), fds=fds)[0]
+daemon_end.close()
+m = re.search(r"/w(\d+)/g(\d+)$", path)
+os.set_inheritable(client_end.fileno(), True)
+
+data = os.path.expanduser("~/.local/share/lapis-doom"); os.makedirs(data, exist_ok=True)
+# IWAD preference (Bring Your Own WAD): $LAPIS_DOOM_IWAD, then WADs in ~/.local/share/lapis-doom/iwads/
+# (your own DOOM.WAD / DOOM2.WAD first, then the optional shareware DOOM1.WAD, then Freedoom), then share/.
+def pick_iwad():
+    if os.environ.get("LAPIS_DOOM_IWAD"): return os.environ["LAPIS_DOOM_IWAD"]
+    names = ["DOOM.WAD", "doom.wad", "DOOMU.WAD", "DOOM2.WAD", "doom2.wad", "DOOM1.WAD", "doom1.wad",
+             "freedoom1.wad", "freedoom2.wad"]
+    for d in [os.path.join(data, "iwads"), os.path.join(ROOT, "share")]:
+        for n in names:
+            if os.path.isfile(os.path.join(d, n)): return os.path.join(d, n)
+    print("No IWAD found. Copy your DOOM.WAD/DOOM2.WAD to ~/.local/share/lapis-doom/iwads/ "
+          "or run ~/.local/opt/lapis-doom/fetch-shareware.sh for the free shareware episode.", file=sys.stderr)
+    sys.exit(3)
+wad = pick_iwad()
+if "-iwad" in sys.argv[1:]: wad = sys.argv[sys.argv.index("-iwad") + 1]
+env = dict(os.environ, LAPIS_FRAME_FD=str(client_end.fileno()),
+           LAPIS_WINDOW_ID=m.group(1), LAPIS_WINDOW_GEN=m.group(2))
+args = sys.argv[1:]
+if "-iwad" in args: i = args.index("-iwad"); del args[i:i + 2]
+cmd = [os.path.join(HERE, "lapis-doom"), "-iwad", wad] + args
+# exec in place: the display daemon checks that frames come from the same PID that
+# created the window (SO_PASSCRED), so Doom must replace this process, not be a child.
+os.chdir(data)
+if not os.isatty(2):                      # keep a log when started from the menu / nohup
+    logfd = os.open(os.path.join(data, "last-run.log"), os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o644)
+    os.dup2(logfd, 1); os.dup2(logfd, 2); os.close(logfd)
+print("lapis-doom-launch: iwad", wad, flush=True)
+os.set_inheritable(lock.fileno(), True)   # keep the single-instance lock held by Doom
+os.execve(cmd[0], cmd, env)

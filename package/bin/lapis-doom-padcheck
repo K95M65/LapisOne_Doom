@@ -1,0 +1,26 @@
+#!/bin/sh
+# Check whether a USB Xbox controller plugged into the Lapis is usable by lapis-doom.
+BIN=$(dirname "$(readlink -f "$0")")
+echo "== kernel joystick support"
+if [ -d /sys/module/xpad ]; then echo "xpad driver present (evdev path will be used)"; else echo "no xpad driver in this kernel -> lapis-doom uses its built-in USB driver (usbfs)"; fi
+echo "== Xbox-class USB devices (vendor class ff, subclass 5d=360 / 47=One/Series)"
+found=0; seen=""
+for d in /sys/bus/usb/devices/*:*; do
+  [ -f "$d/bInterfaceClass" ] || continue
+  c=$(cat $d/bInterfaceClass) s=$(cat $d/bInterfaceSubClass) p=$(cat $d/bInterfaceProtocol)
+  if [ "$c" = ff ] && { [ "$s" = 5d ] || [ "$s" = 47 ]; }; then
+    dev=$(dirname $d)/$(basename $d | cut -d: -f1); dev=$(readlink -f "$dev")
+    bus=$(cat $dev/busnum) num=$(cat $dev/devnum)
+    node=$(printf /dev/bus/usb/%03d/%03d $bus $num)
+    case " $seen " in *" $node "*) continue;; esac; seen="$seen $node"
+    echo "$(cat $dev/idVendor):$(cat $dev/idProduct) $(cat $dev/product 2>/dev/null) -> $node ($(ls -l $node | awk '{print $1,$3,$4}'))"
+    found=1
+    if [ -r "$node" ] && [ -w "$node" ]; then echo "  read/write OK for $(id -un)"; else
+      echo "  NOT writable by $(id -un). Run: doom-usb-allow   (asks your device password; resets on unplug/reboot)"; fi
+  fi
+done
+[ $found = 1 ] || echo "none found - plug the controller into USB 3 or USB 4 on the Lapis"
+echo "== evdev gamepads (Bluetooth pads)"
+awk 'BEGIN{RS=""} /Handlers=.*js[0-9]/ {print}' /proc/bus/input/devices | grep -E '^N:' || echo "none"
+echo "== live test (5 s, move sticks / press buttons)"
+"$BIN/lapis-usbpad-test" 5

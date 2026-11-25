@@ -1,0 +1,9 @@
+# build outputs
+engine/build/
+engine/lapis-doom
+dist/
+*.o
+# game data is never committed: bring your own WAD
+*.wad
+*.WAD
+*.zip
