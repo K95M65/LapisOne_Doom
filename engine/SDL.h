@@ -1,3 +1,4 @@
+// Copyright (C) 2026 K95M65. Licensed under the GNU GPL v2 (see LICENSE and NOTICE).
 /* Minimal SDL shim so Chocolate Doom's OPL code runs on the Lapis mixer (no real SDL). */
 #ifndef LAPIS_SDL_SHIM_H
 #define LAPIS_SDL_SHIM_H

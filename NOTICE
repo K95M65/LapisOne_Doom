@@ -1,0 +1,23 @@
+LapisOne_Doom
+
+Copyright (C) 2026 K95M65
+
+The Lapis One backend and tooling in this repository are original work by K95M65, licensed under the
+GNU General Public License, version 2 (see LICENSE). That covers:
+  engine/doomgeneric_lapis.c, lapis_render.[ch], usbpad.[ch], i_lapissound.c, lapis_state.c,
+  lapis_compat.h, SDL.h, SDL_mixer.h, bluenoise64.h, the small changes to the engine, build.sh,
+  package/, lapis/tools/ and the documentation.
+
+Third-party code keeps its own copyright notices, which are intact in the source files and are not
+claimed by K95M65:
+  - DOOM source, Copyright (C) 1993-1996 id Software, Inc. (released under the GNU GPL v2)
+  - Chocolate Doom, Copyright (C) 2005-2014 Simon Howard and contributors, including Andrey Budko and
+    Ben Ryves (GPL v2), including the OPL music and MIDI code in engine/
+  - Raven Software, Copyright (C) 1993-2008 (shared Heretic/Hexen-derived code in Chocolate Doom, GPL v2)
+  - doomgeneric, by ozkl (GPL v2)
+  - Nuked OPL3, Copyright (C) 2013-2016 Alexey Khokholov (Nuke.YKT) (GPL v2 or later)
+  - The GNU General Public License text in LICENSE is Copyright (C) 1989, 1991 Free Software Foundation, Inc.
+
+DOOM is a trademark of id Software / ZeniMax Media. Xbox is a trademark of Microsoft Corporation.
+Lapis One is a product of Pamir.ai. This project is not affiliated with or endorsed by any of them.
+No game data (WAD files) is distributed here.

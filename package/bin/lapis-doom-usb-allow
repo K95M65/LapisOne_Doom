@@ -1,4 +1,5 @@
 #!/bin/sh
+# Copyright (C) 2026 K95M65. Licensed under the GNU GPL v2 (see LICENSE and NOTICE).
 # Grant the lapis user read/write on any plugged-in Xbox USB controller so Doom's
 # built-in USB driver can use it. Asks for YOUR device password via sudo.
 # Lasts until the controller is unplugged or the Lapis restarts; run again after that.

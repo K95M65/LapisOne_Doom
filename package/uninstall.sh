@@ -1,4 +1,5 @@
 #!/bin/sh
+# Copyright (C) 2026 K95M65. Licensed under the GNU GPL v2 (see LICENSE and NOTICE).
 systemctl --user disable --now lapis-doom-dock.service >/dev/null 2>&1 || true
 rm -f "$HOME/.config/systemd/user/lapis-doom-dock.service"; systemctl --user daemon-reload >/dev/null 2>&1 || true
 pkill -x lapis-doom 2>/dev/null || true

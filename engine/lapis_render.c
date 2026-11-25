@@ -1,3 +1,4 @@
+// Copyright (C) 2026 K95M65. Licensed under the GNU GPL v2 (see LICENSE and NOTICE).
 // Doom 320x200 colour -> Lapis 400x240 1-bit (Sharp memory LCD, same panel class as Playdate).
 #include "lapis_render.h"
 #include <math.h>

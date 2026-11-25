@@ -1,3 +1,4 @@
+// Copyright (C) 2026 K95M65. Licensed under the GNU GPL v2 (see LICENSE and NOTICE).
 /* Bridges Chocolate Doom 3.0.1 OPL/MIDI sources to doomgeneric's older headers. */
 #ifndef LAPIS_COMPAT_H
 #define LAPIS_COMPAT_H

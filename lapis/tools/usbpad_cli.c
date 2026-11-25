@@ -1,3 +1,4 @@
+// Copyright (C) 2026 K95M65. Licensed under the GNU GPL v2 (see LICENSE and NOTICE).
 // lapis-usbpad-test: list/poll Xbox USB pads via usbfs (diagnostic for doom-padcheck)
 #include "usbpad.h"
 #include <stdio.h>

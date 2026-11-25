@@ -88,7 +88,7 @@ Display options (environment variables): `LAPIS_DOOM_DITHER=atkinson|blue|floyd|
   input), `lapis_render.c` (1-bit renderer), `usbpad.c` (Xbox USB driver), `i_lapissound.c` (audio),
   Chocolate Doom's OPL music code with a tiny SDL shim.
 - `package/` launcher, launcher dock, install/uninstall, shareware fetcher, controller helpers.
-- `lapis/tools/` controller test CLI, parser tests, renderer test tool. `tools/` qemu test harness.
+- `lapis/tools/` controller test CLI (used by `doom-padcheck`).
 
 ## Credits and legal
 - **DOOM** © id Software. DOOM is a trademark of id Software / ZeniMax Media. id released the DOOM engine
@@ -101,5 +101,8 @@ Display options (environment variables): `LAPIS_DOOM_DITHER=atkinson|blue|floyd|
   The controller driver is an independent implementation informed by the Linux `xpad` driver.
 - **Lapis One** hardware, display protocol and docs by **Pamir.ai**. Not affiliated with Pamir.ai.
 - No libusb is used; the controller driver talks to Linux usbfs directly.
+
+Copyright (C) 2026 K95M65 for the Lapis One code in this repository (see `NOTICE`). Upstream copyrights
+(id Software, Simon Howard / Chocolate Doom, doomgeneric, Nuked OPL3) are kept intact in the source files.
 
 License: GPL-2.0 (see `LICENSE`), the same as Chocolate Doom and doomgeneric.

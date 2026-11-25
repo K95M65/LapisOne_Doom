@@ -1,4 +1,5 @@
 #!/bin/sh
+# Copyright (C) 2026 K95M65. Licensed under the GNU GPL v2 (see LICENSE and NOTICE).
 # Check whether a USB Xbox controller plugged into the Lapis is usable by lapis-doom.
 BIN=$(dirname "$(readlink -f "$0")")
 echo "== kernel joystick support"

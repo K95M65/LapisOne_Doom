@@ -1,3 +1,4 @@
+// Copyright (C) 2026 K95M65. Licensed under the GNU GPL v2 (see LICENSE and NOTICE).
 /* 64x64 void-and-cluster blue noise threshold map, values 0..255 */
 static const unsigned char bluenoise64[64*64] = {
 209,48,172,131,61,93,141,2,192,152,74,169,228,85,0,75,134,56,112,238,65,172,16,109,226,184,114,20,131,44,185,230,93,45,143,0,178,157,118,64,166,101,124,73,167,13,239,148,104,159,35,194,0,179,59,111,139,193,235,150,85,110,175,145,

@@ -1,4 +1,5 @@
 #!/bin/sh
+# Copyright (C) 2026 K95M65. Licensed under the GNU GPL v2 (see LICENSE and NOTICE).
 # Cross-build lapis-doom for the Lapis One (aarch64, fully static) and make an install bundle.
 # Needs: aarch64-linux-gnu-gcc (Debian/Ubuntu: apt install gcc-aarch64-linux-gnu), make, tar.
 set -e

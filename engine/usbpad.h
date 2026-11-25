@@ -1,3 +1,4 @@
+// Copyright (C) 2026 K95M65. Licensed under the GNU GPL v2 (see LICENSE and NOTICE).
 #ifndef USBPAD_H
 #define USBPAD_H
 #include <stdint.h>

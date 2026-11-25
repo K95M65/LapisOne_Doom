@@ -1,4 +1,5 @@
 #!/bin/sh
+# Copyright (C) 2026 K95M65. Licensed under the GNU GPL v2 (see LICENSE and NOTICE).
 # Optional: download id Software's freely distributable DOOM shareware v1.9 (Episode 1, "Knee-Deep in the Dead")
 # from the idgames archive and verify it before use. Nothing is downloaded unless you run this (or say yes in install.sh).
 # The shareware release may be freely redistributed unmodified; it is NOT the full game.

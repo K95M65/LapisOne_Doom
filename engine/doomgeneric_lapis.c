@@ -1,3 +1,4 @@
+// Copyright (C) 2026 K95M65. Licensed under the GNU GPL v2 (see LICENSE and NOTICE).
 // doomgeneric backend for the Pamir Lapis One 400x240 1-bit screen.
 // Frames go over the lapis-hwserviced app-window protocol v1 (LPFW packets on a
 // SOCK_SEQPACKET socket that the launcher obtained via D-Bus CreateWindow and

@@ -1,4 +1,5 @@
 #!/bin/sh
+# Copyright (C) 2026 K95M65. Licensed under the GNU GPL v2 (see LICENSE and NOTICE).
 # Installs lapis-doom into your home folder only (kept across Lapis updates). No system files touched.
 set -e
 SRC=$(cd "$(dirname "$0")" && pwd)

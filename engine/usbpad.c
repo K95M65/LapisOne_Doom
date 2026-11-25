@@ -1,3 +1,4 @@
+// Copyright (C) 2026 K95M65. Licensed under the GNU GPL v2 (see LICENSE and NOTICE).
 // Userspace Xbox 360 / One / Series USB controller driver over Linux usbfs
 // (/dev/bus/usb). For kernels without xpad (the Lapis One kernel has
 // CONFIG_INPUT_JOYSTICK unset and no module support). No libusb needed:

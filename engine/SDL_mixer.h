@@ -1,3 +1,4 @@
+// Copyright (C) 2026 K95M65. Licensed under the GNU GPL v2 (see LICENSE and NOTICE).
 #ifndef LAPIS_SDL_MIXER_SHIM_H
 #define LAPIS_SDL_MIXER_SHIM_H
 #include "SDL.h"

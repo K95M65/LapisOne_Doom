@@ -1,4 +1,5 @@
 #define _GNU_SOURCE
+// Copyright (C) 2026 K95M65. Licensed under the GNU GPL v2 (see LICENSE and NOTICE).
 // Lapis One sound backend for doomgeneric (GPLv2, like Chocolate Doom).
 // SFX: own 16-channel mixer of the WAD's DMX sounds. Music: Chocolate Doom's OPL (Nuked OPL3)
 // synth through a tiny SDL shim. Output: signed 16-bit stereo PCM piped into PipeWire's

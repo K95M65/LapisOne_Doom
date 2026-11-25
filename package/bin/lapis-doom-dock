@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (C) 2026 K95M65. Licensed under the GNU GPL v2 (see LICENSE and NOTICE).
 """DOOM dock: a small resident app that keeps a DOOM entry in the Lapis "What's open" list.
 
 Open it from What's open and press A (or tap the sensor) to start Doom. Doom runs as its own app;
